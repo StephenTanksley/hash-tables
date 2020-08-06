@@ -8,6 +8,8 @@ class HashTableEntry:
         self.value = value
         self.next = None
 
+        # Need to use HashTableEntry to populate a hash table with new capacity
+
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -24,7 +26,7 @@ class HashTable:
     def __init__(self, capacity):
         # Your code here
         self.capacity = capacity
-        self.table = [None] * self.capacity
+        self.table = [None] * capacity
 
     def get_num_slots(self):
         """
@@ -57,7 +59,6 @@ class HashTable:
         """
 
         # Your code here
-
         pass
 
     def djb2(self, key):
@@ -71,6 +72,7 @@ class HashTable:
         for x in key:
             hash_value = ((hash_value << 5) + hash_value) + ord(x)
 
+        # hash_value = ((5381 * 2^5) + 5381) + ord(x)
         return hash_value & 0xffffffff
 
     def hash_index(self, key):
