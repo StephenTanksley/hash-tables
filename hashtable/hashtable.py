@@ -71,9 +71,10 @@ class HashTable:
         hash_value = 5381
         for x in key:
             hash_value = ((hash_value << 5) + hash_value) + ord(x)
+            hash_value &= 0xffffffff
 
         # hash_value = ((5381 * 2^5) + 5381) + ord(x)
-        return hash_value & 0xffffffff
+        return hash_value % self.capacity
 
     def hash_index(self, key):
         """
@@ -91,7 +92,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        hashed_key = self.djb2(key)
+        self.table[hashed_key] = value
 
     def delete(self, key):
         """
@@ -102,6 +104,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hashed_key = self.djb2(key)
+        self.table[hashed_key] = None
 
     def get(self, key):
         """
@@ -112,6 +116,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hashed_key = self.djb2(key)
+        return self.table[hashed_key]
 
     def resize(self, new_capacity):
         """
