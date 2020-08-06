@@ -29,7 +29,9 @@ class HashTable:
             self.capacity = capacity
         else:
             self.capacity = MIN_CAPACITY
-        self.table = [None] * self.capacity
+
+        # Using the pre-determined capacity to determine how large the table is.
+        self.table = [None] * capacity
 
     def get_num_slots(self):
         """
@@ -42,6 +44,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+
+        # We return the length of the array that we've initialized.
         return len(self.table)
 
     def get_load_factor(self):
@@ -94,7 +98,9 @@ class HashTable:
 
         Implement this.
         """
+        # Under the hood, this
         hashed_key = self.hash_index(key)
+
         self.table[hashed_key] = value
 
     def delete(self, key):
@@ -107,7 +113,7 @@ class HashTable:
         """
         # Your code here
         hashed_key = self.hash_index(key)
-        data = self.table[self.hash_index(hashed_key)]
+        data = self.table[self.hash_index(key)]
 
         if data:
             self.table[hashed_key] = None
