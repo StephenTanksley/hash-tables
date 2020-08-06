@@ -25,8 +25,11 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-        self.capacity = capacity
-        self.table = [None] * capacity
+        if (capacity >= MIN_CAPACITY):
+            self.capacity = capacity
+        else:
+            self.capacity = MIN_CAPACITY
+        self.table = [None] * self.capacity
 
     def get_num_slots(self):
         """
@@ -71,10 +74,9 @@ class HashTable:
         hash_value = 5381
         for x in key:
             hash_value = ((hash_value << 5) + hash_value) + ord(x)
-            hash_value &= 0xffffffff
 
         # hash_value = ((5381 * 2^5) + 5381) + ord(x)
-        return hash_value % self.capacity
+        return hash_value & 0xffffffff
 
     def hash_index(self, key):
         """
@@ -92,7 +94,7 @@ class HashTable:
 
         Implement this.
         """
-        hashed_key = self.djb2(key)
+        hashed_key = self.hash_index(key)
         self.table[hashed_key] = value
 
     def delete(self, key):
@@ -104,8 +106,13 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        hashed_key = self.djb2(key)
-        self.table[hashed_key] = None
+        hashed_key = self.hash_index(key)
+        data = self.table[self.hash_index(hashed_key)]
+
+        if data:
+            self.table[hashed_key] = None
+        else:
+            return f'Item at index {hashed_key} was not found.'
 
     def get(self, key):
         """
@@ -116,8 +123,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        hashed_key = self.djb2(key)
-        return self.table[hashed_key]
+        data = self.table[self.hash_index(key)]
+        if data:
+            return data
+        else:
+            return None
 
     def resize(self, new_capacity):
         """
