@@ -37,12 +37,15 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return len(self.table)
 
     def get_load_factor(self):
         """
-        Return the load factor for this hash table.
 
-        Implement this.
+        The load factor is the number of keys stored in the hash table divided by the capacity. The size should be chosen so that the load factor is less than 1. For instance, if we want to implement a German-English dictionary with 50,000 German words, we need a hash table that is larger than 50,000. 
+
+        https://cs.nyu.edu/courses/fall17/CSCI-UA.0102-001/Notes/HashTableImplementation.html
+
         """
         # Your code here
 
