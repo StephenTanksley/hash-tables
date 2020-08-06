@@ -54,6 +54,9 @@ class HashTable:
         """
         # Your code here
 
+        # loaded_table = [item != None for item in self.table]
+        # return loaded_table // self.capacity
+
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
@@ -72,8 +75,8 @@ class HashTable:
         """
         # Your code here
         hash_value = 5381
-        for x in key:
-            hash_value = ((hash_value << 5) + hash_value) + ord(x)
+        for char in key:
+            hash_value = ((hash_value << 5) + hash_value) + ord(char)
 
         # hash_value = ((5381 * 2^5) + 5381) + ord(x)
         return hash_value & 0xffffffff
@@ -123,7 +126,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        data = self.table[self.hash_index(key)]
+        hashed_index = self.hash_index(key)
+        data = self.table[hashed_index]
         if data:
             return data
         else:
