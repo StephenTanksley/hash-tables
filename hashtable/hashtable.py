@@ -98,11 +98,20 @@ class HashTable:
 
         Implement this.
         """
-        # Under the hood, this
+        # Under the hood, this is converting the provided key to a hash and then reducing it to an index.
         hashed_key = self.hash_index(key)
 
-        # self.table[hashed_key] = value
-        self.table[hashed_key] = HashTableEntry(key, value)
+        # This creates a new entry into the table will be the head of a Linked List.
+        new_entry = HashTableEntry(key, value)
+
+        # If there's nothing at the location, insert the new entry there.
+        if self.table[hashed_key] == None:
+            self.table[hashed_key] = new_entry
+        # If there IS something at that location, we should chain onto it.
+        else:
+            # Theoretically, this should be creating the pointer reference to the current "head" and then overwriting it with the new data.
+            new_entry.next = self.table[hashed_key]
+            self.table[hashed_key] = new_entry
 
     def delete(self, key):
         """
