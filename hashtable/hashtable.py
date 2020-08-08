@@ -49,18 +49,36 @@ class HashTable:
         return len(self.table)
 
     def get_load_factor(self):
+        pass
         """
-
-        The load factor is the number of keys stored in the hash table divided by the capacity. The size should be chosen so that the load factor is less than 1. For instance, if we want to implement a German-English dictionary with 50,000 German words, we need a hash table that is larger than 50,000. 
-
-        https://cs.nyu.edu/courses/fall17/CSCI-UA.0102-001/Notes/HashTableImplementation.html
+        Naive implementation - just loop through the table to make sure that you're getting all items. 
 
         """
-        # Your code here
+        # This is a naive implementation which assumes that only one item is present at any one location.
+        # loaded_table = [item != None for item in self.table]
+        # load_factor = len(loaded_table) / self.capacity
+        # return load_factor
 
-        loaded_table = [item != None for item in self.table]
-        load_factor = len(loaded_table) / self.capacity
-        return load_factor
+        """
+        PROBLEM: How do we handle the case where more than one item already exists at that index?
+        SOLUTION: 
+            Pre-loop - set up a counter. Counter = 0
+            1) Set up a loop to cycle through items in the table. We'll want to keep track of the current node.
+            2) while current_node.next is not None:
+                2a) If i.next has value, increment counter += 1.
+                2b) Move to next node. current_node = current_node.next
+                2c) If current_node.next is None, we can return and move to the next item in the table and repeat.
+            3) Divide counter / capacity. This is going to account for items which may have been hashed into the same spot.
+        """
+
+        counter = 0
+        for i in self.table:
+            while i is not None:
+                current_node = i
+                if i.next:
+                    counter += 1
+                    current_node = current_node.next
+                return counter
 
     def fnv1(self, key):
         """
