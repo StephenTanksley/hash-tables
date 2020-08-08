@@ -104,8 +104,8 @@ class HashTable:
         # Under the hood, this
         hashed_key = self.hash_index(key)
 
-        # self.table[hashed_key] = value
-        self.table[hashed_key] = HashTableEntry(key, value)
+        self.table[hashed_key] = value
+        # self.table[hashed_key] = HashTableEntry(key, value)
 
     def delete(self, key):
         """
