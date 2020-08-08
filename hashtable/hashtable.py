@@ -49,7 +49,6 @@ class HashTable:
         return len(self.table)
 
     def get_load_factor(self):
-        pass
         """
         Naive implementation - just loop through the table to make sure that you're getting all items. 
 
@@ -60,10 +59,14 @@ class HashTable:
         # return load_factor
 
         """
-        PROBLEM: How do we handle the case where more than one item already exists at that index?
-        SOLUTION: 
+        PROBLEM: How do we handle the case where more than one item may already exist at that index?
+        
+        SOLUTION: We need to set up logic to handle the case where there may be a linked list chain.
+        
             Pre-loop - set up a counter. Counter = 0
             1) Set up a loop to cycle through items in the table. We'll want to keep track of the current node.
+                1a) If the current item (first item in the loop) has value, we want to increment counter += 1. 
+                1b) We're really only interested in checking things if they have value.
             2) while current_node.next is not None:
                 2a) If i.next has value, increment counter += 1.
                 2b) Move to next node. current_node = current_node.next
@@ -72,13 +75,17 @@ class HashTable:
         """
 
         counter = 0
+
+        # Need to ask Hui about this. Not sure the BigO properties here. Normally I'd say O(n) judging by the length of the list, but we also have to consider that by using a linked list, we're potentially overloading each slot.
+
         for i in self.table:
-            while i is not None:
-                current_node = i
-                if i.next:
-                    counter += 1
+            current_node = i
+            if current_node.value is not None:
+                counter += 1
+                while current_node.next is not None:
                     current_node = current_node.next
-                return counter
+
+        return counter / self.capacity
 
     def fnv1(self, key):
         """
@@ -200,7 +207,7 @@ if __name__ == "__main__":
     for i in range(1, 13):
         print(ht.get(f"line_{i}"))
 
-    ht.get_load_factor()
+    print("Current load factor: ", ht.get_load_factor())
 
     # Test resizing
     old_capacity = ht.get_num_slots()
