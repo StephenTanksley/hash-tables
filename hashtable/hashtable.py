@@ -58,8 +58,9 @@ class HashTable:
         """
         # Your code here
 
-        # loaded_table = [item != None for item in self.table]
-        # return loaded_table // self.capacity
+        loaded_table = [item != None for item in self.table]
+        load_factor = len(loaded_table) / self.capacity
+        return load_factor
 
     def fnv1(self, key):
         """
@@ -180,6 +181,8 @@ if __name__ == "__main__":
     # Test storing beyond capacity
     for i in range(1, 13):
         print(ht.get(f"line_{i}"))
+
+    ht.get_load_factor()
 
     # Test resizing
     old_capacity = ht.get_num_slots()
