@@ -32,6 +32,8 @@ class HashTable:
 
         # Using the pre-determined capacity to determine how large the table is.
         self.table = [None] * capacity
+        # self.load_factor = None -- Used for a slower implementation.
+        self.items = 0
 
     def get_num_slots(self):
         """
@@ -74,18 +76,22 @@ class HashTable:
             3) Divide counter / capacity. This is going to account for items which may have been hashed into the same spot.
         """
 
-        counter = 0
+        # counter = 0
 
-        # Need to ask Hui about this. Not sure the BigO properties here. Normally I'd say O(n) judging by the length of the list, but we also have to consider that by using a linked list, we're potentially overloading each slot.
+        # # Need to ask Hui about this. Not sure the BigO properties here. Normally I'd say O(n) judging by the length of the list, but we also have to consider that by using a linked list, we're potentially overloading each slot.
 
-        for i in self.table:
-            current_node = i
-            if current_node.value is not None:
-                counter += 1
-                while current_node.next is not None:
-                    current_node = current_node.next
+        # for i in self.table:
+        #     current_node = i
+        #     if current_node.value is not None:
+        #         counter += 1
+        #         while current_node.next is not None:
+        #             current_node = current_node.next
 
-        return counter / self.capacity
+        # self.load_factor = counter / self.capacity
+
+        # return self.load_factor
+        load_factor = self.items / self.capacity
+        return load_factor
 
     def fnv1(self, key):
         """
@@ -130,17 +136,19 @@ class HashTable:
         # Under the hood, this is converting the provided key to a hash and then reducing it to an index.
         hashed_key = self.hash_index(key)
 
-        # This creates a new entry into the table will be the head of a Linked List.
+        # This creates a new entry into the table which will be the head of a Linked List.
         new_entry = HashTableEntry(key, value)
 
         # If there's nothing at the location, insert the new entry there.
         if self.table[hashed_key] == None:
             self.table[hashed_key] = new_entry
+            self.items += 1
         # If there IS something at that location, we should chain onto it.
         else:
             # Theoretically, this should be creating the pointer reference to the current "head" and then overwriting it with the new data.
             new_entry.next = self.table[hashed_key]
             self.table[hashed_key] = new_entry
+            self.items += 1
 
     def delete(self, key):
         """
@@ -149,6 +157,8 @@ class HashTable:
         Print a warning if the key is not found.
 
         Implement this.
+
+        TODO - Need to check against the keys AND value to make sure that I'm deleting the right thing.
         """
         # Your code here
         hashed_key = self.hash_index(key)
@@ -156,6 +166,7 @@ class HashTable:
 
         if data:
             self.table[hashed_key] = None
+            self.items -= 1
         else:
             return f'Item at index {hashed_key} was not found.'
 
