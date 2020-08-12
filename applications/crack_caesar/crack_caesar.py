@@ -3,7 +3,7 @@
 
 # Your code here
 
-from collections import Counter
+from collections import Counter, OrderedDict
 
 """
     NOTE TO SELF: You have to be in the directory itself in order for the open command to work. CD into the proper directory first, then try to run the text.
@@ -26,6 +26,8 @@ from collections import Counter
 
 letter_frequency = ['E', 'T', 'A', 'O', 'H', 'N', 'R', 'I', 'S', 'D', 'L', 'W', 'U',
                     'G', 'F', 'B', 'M', 'Y', 'C', 'P', 'K', 'V', 'Q', 'J', 'X', 'Z']
+
+most_common = []
 
 # decode_table = {v: k for k, v in encode_table.items()}
 
@@ -50,33 +52,53 @@ letter_frequency = ['E', 'T', 'A', 'O', 'H', 'N', 'R', 'I', 'S', 'D', 'L', 'W', 
 #             cipher += decode_table[char.upper()]
 #     return cipher
 
-punctuation = ['!', '(', ')', '-', '[', ']', '{', '}', ';', ':', ',', '"',
-               "'", '<', '>', '.', '/', '?', '@', '#', '$', '%', '^', '&', '*', '_', '~']
+
+# I am actually instantiating a dictionary here because I need to have both keys and values.
+
+counted = Counter()
+
+# define a helper function to define rules for the counter.
 
 
-with open("ciphertext.txt", 'r') as reader:
-    for line in reader:
-        print(line, end="")
-
-c = Counter()
-
-
-def build_key(text):
-    for char in text:
+def build_counter(text):
+    for char in line:
         if char.isspace():
             continue
-        elif char in punctuation:
+        elif char not in letter_frequency:
             continue
-        else:
-            c.update(char)
+        counted.update(char)
+
+# define a helper function to create a new decoded message.
 
 
-build_key(reader)
-print(c)
+def crack_substitution(cipher, key_dict):
+
+    decoded = ""
+    for line in cipher:
+        for char in line:
+            if char.isspace():
+                decoded += " "
+            elif char not in letter_frequency:
+                decoded += char
+            else:
+                decoded += key_dict[char.upper()]
+    return decoded
 
 
-def crack_substitution(text):
-    pass
+# open the text document up.
+reader = open("ciphertext.txt", 'r')
+writer = open("decipheredtext.txt", 'w')
+
+for line in reader:
+    build_counter(line)
+
+# creating a list of the most common keys in the block of text.
+for i, _ in counted.most_common():
+    most_common.append(i)
+
+# constructing a decryption key using letter frequency.
+key = {most_common[i]: letter_frequency[i]
+       for i in range(len(letter_frequency))}
 
 
 reader.close()
