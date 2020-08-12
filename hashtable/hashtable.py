@@ -17,7 +17,7 @@ MIN_CAPACITY = 8
 
 class HashTable:
     """
-    A hash table that with `capacity` buckets
+    A hash table that with `capacity` table
     that accepts string keys
 
     Implement this.
@@ -36,15 +36,7 @@ class HashTable:
         self.items = 0
 
     def get_num_slots(self):
-        """
-        Return the length of the list you're using to hold the hash
-        table data. (Not the number of items stored in the hash table,
-        but the number of slots in the main list.)
 
-        One of the tests relies on this.
-
-        Implement this.
-        """
         # Your code here
 
         # We return the length of the array that we've initialized.
@@ -94,21 +86,11 @@ class HashTable:
         return load_factor
 
     def fnv1(self, key):
-        """
-        FNV-1 Hash, 64-bit
 
-        Implement this, and/or DJB2.
-        """
-
-        # Your code here
         pass
 
     def djb2(self, key):
-        """
-        DJB2 hash, 32-bit
 
-        Implement this, and/or FNV-1.
-        """
         # Your code here
         hash = 5381
         for i in key:
@@ -118,73 +100,93 @@ class HashTable:
         return hash & 0xffffffff
 
     def hash_index(self, key):
-        """
-        Take an arbitrary key and return a valid integer index
-        between within the storage capacity of the hash table.
-        """
+
         # return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
-        """
-        Store the value with the given key.
 
-        Hash collisions should be handled with Linked List Chaining.
-
-        Implement this.
-        """
-        # Under the hood, this is converting the provided key to a hash and then reducing it to an index.
-        hashed_key = self.hash_index(key)
-
-        # This creates a new entry into the table which will be the head of a Linked List.
         new_entry = HashTableEntry(key, value)
+        hashed_index = self.hash_index(key)
 
-        # If there's nothing at the location, insert the new entry there.
-        if self.table[hashed_key] == None:
-            self.table[hashed_key] = new_entry
+        # Find the place to start the insertion.
+        if self.table[hashed_index] is not None:
+
+            # If something already exists there...
+            current = self.table[hashed_index]
+            while current is not None:
+                # if the key already exists
+                if current.key == key:
+                    # overwrite what's there currently. We no longer need what was there before.
+                    current.value = value
+                    return
+                current = current.next
+            # add the new_entry to the head of the linked list.
+            current_head = self.table[hashed_index]
+            self.table[hashed_index] = new_entry
+            self.table[hashed_index].next = current_head
             self.items += 1
-        # If there IS something at that location, we should chain onto it.
+
+        # If we get lucky and there's nothing in the spot at the hashed index.
         else:
-            # Theoretically, this should be creating the pointer reference to the current "head" and then overwriting it with the new data.
-            new_entry.next = self.table[hashed_key]
-            self.table[hashed_key] = new_entry
+            # add new_entry
+            self.table[hashed_index] = new_entry
             self.items += 1
+
+        # automatic resizing if load factor increases above 0.7
+        if self.get_load_factor() > 0.7:
+            self.resize(self.capacity * 2)
 
     def delete(self, key):
-        """
-        Remove the value stored with the given key.
 
-        Print a warning if the key is not found.
+        # hash the current key to get the index for the table.
+        hashed_index = self.hash_index(key)
 
-        Implement this.
+        # If the table has an entry at that index
+        if self.table[hashed_index] is not None:
 
-        TODO - Need to check against the keys AND value to make sure that I'm deleting the right thing.
-        """
-        # Your code here
-        hashed_key = self.hash_index(key)
-        data = self.table[self.hash_index(key)]
+            # set the current node to be the head of that list
+            current = self.table[hashed_index]
 
-        if data:
-            self.table[hashed_key] = None
-            self.items -= 1
-        else:
-            return f'Item at index {hashed_key} was not found.'
+            # if we get lucky and the current key is the one we're looking for
+            if current.key == key:
+                # change our currently selected index to point to next thing in the list.
+                self.table[hashed_index] = current.next
+                # reduce the number of items that we're tracking by one.
+                self.items -= 1
+                return current.value
+
+            # Otherwise, we want to keep track of what the previous value was because we'll have to cut out the linked list node we're evaluating and link around it.
+            previous = current
+            current = current.next
+
+            # We repeat the process of checking the key down the line
+            while current is not None:
+                if current.key == key:
+                    previous.next = current.next
+                    self.items -= 1
+                    return current.value
+                else:
+                    previous = current
+                    current = current.next
+
+        # Finally, check to make sure that we're in our parameters for the load_factor.
+        if self.get_load_factor() < 0.2:
+            self.resize(self.capacity // 2)
+
+        return f"Key at table index {hashed_index} was not found."
 
     def get(self, key):
-        """
-        Retrieve the value stored with the given key.
-
-        Returns None if the key is not found.
-
-        Implement this.
-        """
         # Your code here
         hashed_index = self.hash_index(key)
-        data = self.table[hashed_index]
-        if data:
-            return data
-        else:
-            return None
+
+        current = self.table[hashed_index]
+
+        while current is not None:
+            if current.key == key:
+                return current.value
+            current = current.next
+        return None
 
     def resize(self, new_capacity):
         """
@@ -194,6 +196,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
+
+        # create a reference to the old table.
+        old_table = self.table
+
+        # define the new capacity for the table.
+        self.capacity = new_capacity if new_capacity >= MIN_CAPACITY else MIN_CAPACITY
+
+        # create a new table at the new capacity.
+        new_table = [None] * self.capacity
+        self.table = new_table
+
+        # reset items to 0
+        self.items = 0
+
+        for entry in old_table:
+            current_entry = entry
+
+            while current_entry is not None:
+                self.put(current_entry.key, current_entry.value)
+                current_entry = current_entry.next
 
 
 if __name__ == "__main__":
