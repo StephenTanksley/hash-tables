@@ -61,7 +61,7 @@ counted = Counter()
 
 
 def build_counter(text):
-    for char in line:
+    for char in text:
         if char.isspace():
             continue
         elif char not in letter_frequency:
@@ -71,34 +71,44 @@ def build_counter(text):
 # define a helper function to create a new decoded message.
 
 
-def crack_substitution(cipher, key_dict):
-
+def crack_substitution(cipher, legend):
     decoded = ""
-    for line in cipher:
-        for char in line:
-            if char.isspace():
-                decoded += " "
-            elif char not in letter_frequency:
-                decoded += char
-            else:
-                decoded += key_dict[char.upper()]
+
+    for char in cipher:
+        if char.isspace():
+            decoded += " "
+        elif char not in letter_frequency:
+            continue
+        else:
+            decoded += legend[char.upper()]
     return decoded
 
 
 # open the text document up.
 reader = open("ciphertext.txt", 'r')
-writer = open("decipheredtext.txt", 'w')
 
+# open a new document up with writing enabled.
+# writer = open("decipheredtext.txt", 'w')
+
+# checking each line of text and using that line to fill out our counter.
 for line in reader:
     build_counter(line)
 
-# creating a list of the most common keys in the block of text.
+reader.close()
+
+# At this point, our counter has a list of all the keys in it with their appropriate letter counts.
+# Next we create a list of the most common keys in the Counter.
 for i, _ in counted.most_common():
     most_common.append(i)
 
-# constructing a decryption key using letter frequency.
+# We combine that list with the pre-sorted list of letter frequencies in English to construct a key.
 key = {most_common[i]: letter_frequency[i]
        for i in range(len(letter_frequency))}
+
+reader = open('ciphertext.txt', 'r')
+
+for line in reader:
+    print(crack_substitution(line, key))
 
 
 reader.close()
