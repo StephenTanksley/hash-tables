@@ -78,7 +78,7 @@ def crack_substitution(cipher, legend):
         if char.isspace():
             decoded += " "
         elif char not in letter_frequency:
-            continue
+            decoded += char
         else:
             decoded += legend[char.upper()]
     return decoded
@@ -88,7 +88,7 @@ def crack_substitution(cipher, legend):
 reader = open("ciphertext.txt", 'r')
 
 # open a new document up with writing enabled.
-# writer = open("decipheredtext.txt", 'w')
+writer = open("decipheredtext.txt", 'w')
 
 # checking each line of text and using that line to fill out our counter.
 for line in reader:
@@ -108,7 +108,8 @@ key = {most_common[i]: letter_frequency[i]
 reader = open('ciphertext.txt', 'r')
 
 for line in reader:
-    print(crack_substitution(line, key))
+    writer.write(crack_substitution(line, key))
 
 
 reader.close()
+writer.close()
