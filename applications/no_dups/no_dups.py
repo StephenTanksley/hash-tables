@@ -4,7 +4,6 @@
     Solution: We can use a set here. Set is a sub-class of dict which only takes keys. Since we only need the keys, we don't need to push a value to the set. 
     
     We'll split the original string into separate words and then we'll join them based on a sorted set. We'll use a key of words.index to determine the order in which the words are joined to the final return string.
-
 """
 
 
